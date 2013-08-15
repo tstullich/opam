@@ -9,7 +9,7 @@
         android:layout_width="fill_parent"
         android:text="@string/trademark_title"
         android:textSize="40sp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="50dp"
         android:gravity="center" />
     
     <EditText android:id="@+id/username_edit_text"
@@ -17,8 +17,10 @@
         android:layout_width="fill_parent"
         android:layout_below="@id/login_activity_title"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="80dp"
-        android:textSize="24sp"
+        android:layout_marginTop="50dp"
+        android:textSize="20sp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
         android:inputType="text" 
         android:hint="@string/username_edit_text_hint"
         android:background="@drawable/edit_text_selector" />
@@ -27,7 +29,9 @@
         android:layout_height="wrap_content"
         android:layout_width="fill_parent" 
         android:layout_below="@id/username_edit_text"
-        android:textSize="24sp"
+        android:textSize="20sp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
         android:inputType="textPassword"
         android:hint="@string/password_edit_text_hint"
         android:background="@drawable/edit_text_selector" />
@@ -36,14 +40,21 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/password_edit_text" 
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginBottom="10dp"
         android:prompt="@string/login_server_spinner_prompt" />
 
     <Button
         android:id="@+id/login_button"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/servers_spinner"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
         android:layout_centerHorizontal="true"
-        android:text="@string/login_activity_button" />
+        android:text="@string/login_activity_button"
+        android:textSize="16sp"
+        android:background="@drawable/login_button_selector" />
 
 </RelativeLayout>

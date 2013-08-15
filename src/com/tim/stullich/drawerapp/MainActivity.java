@@ -1,10 +1,8 @@
 package com.tim.stullich.drawerapp;
 
-import java.io.IOException;
 import java.util.Locale;
 
-import com.google.gson.Gson;
-
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
@@ -17,6 +15,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,6 +69,13 @@ public class MainActivity extends FragmentActivity {
 		getActionBar().setIcon(R.drawable.oracle_icon);
 	}
 
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.layout.actionbar_menu, menu);
+	    return true;
+	 }
+	
 	/**
 	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
 	 * one of the sections/tabs/pages.
@@ -139,11 +146,6 @@ public class MainActivity extends FragmentActivity {
 		}
 	}
 
-	/**
-	 * When using the ActionBarDrawerToggle, you must call it during
-	 * onPostCreate() and onConfigurationChanged()...
-	 */
-
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
 	    super.onPostCreate(savedInstanceState);
@@ -205,8 +207,6 @@ public class MainActivity extends FragmentActivity {
 			};
 			
 			drawerLayout.setDrawerListener(drawerToggle);
-			
-			Log.i("DrawerList", act.getPackageName());
 			
 			act.getActionBar().setDisplayHomeAsUpEnabled(true);
 			act.getActionBar().setHomeButtonEnabled(true);

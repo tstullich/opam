@@ -1,7 +1,5 @@
 package com.tim.stullich.drawerapp;
 
-import java.util.List;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -12,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -20,6 +19,7 @@ public class LoginActivity extends FragmentActivity {
 	private Button loginButton;
 	private Spinner serverList;
 	private String[] serverNames;
+	private EditText userNameField;
 	private static final String USER_PREFS = "UserPrefs";
 	private static final String SERVER_NAMES = "serverNames";
 	
@@ -27,6 +27,8 @@ public class LoginActivity extends FragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
+		
+		userNameField = (EditText) findViewById(R.id.username_edit_text);
 		
 		loginButton = (Button) findViewById(R.id.login_button);
 		loginButton.setOnClickListener(new LoginOnClickListener());
@@ -57,14 +59,18 @@ public class LoginActivity extends FragmentActivity {
 		serverList.setOnItemSelectedListener(new SpinnerItemSelectedListener());
 	}
 	
+	//TODO Fix this shit
 	private String[] loadServerPreferences() {
 		SharedPreferences prefs = getSharedPreferences(USER_PREFS, 0);
 		int size = prefs.getInt(SERVER_NAMES + "_SIZE", 1);
-		serverNames = new String[size];
 		if (size == 1) {
+			serverNames = new String[size];
+			Log.i("OPAM", "Resource size " + size);
 			serverNames[0]= "<Add New Server>";
+			Log.i("OPAM", serverNames.toString());
 			return serverNames;
 		}
+		serverNames = new String[size + 1];
 		for (int i = 0; i < size; i++) {
 			serverNames[i] = prefs.getString(SERVER_NAMES + "_" + i, null);
 		}
@@ -76,7 +82,7 @@ public class LoginActivity extends FragmentActivity {
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putInt(SERVER_NAMES + "_SIZE", serverNames.length);
 		
-		for (int i = 0; i < serverNames.length; i++) {
+		for (int i = serverNames.length == 1 ? 2 : serverNames.length; i < i - 1; i++) {
 			editor.putString(SERVER_NAMES + "_" + i, serverNames[i]);
 		}
 		
@@ -90,26 +96,25 @@ public class LoginActivity extends FragmentActivity {
 				switch (v.getId()) {
 					case R.id.login_button :
 						Intent i = new Intent(LoginActivity.this, MainActivity.class);
+						i.putExtra("userName", userNameField.getText().toString());
 						LoginActivity.this.startActivity(i);
 				}
-			
 			}
 		}
+		
 		private class SpinnerItemSelectedListener implements OnItemSelectedListener {
 			
+			//TODO Also this
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int pos ,long id) {
 				Toast.makeText(parent.getContext(), 
 						"OnItemSelectedListener : " + parent.getItemAtPosition(pos).toString(),
 						Toast.LENGTH_SHORT).show();
-				Log.i("OPAM", "Item selected: " + pos);
 			}
 
 			@Override
 			public void onNothingSelected(AdapterView<?> arg0) {
-				// TODO Auto-generated method stub
-				Log.i("OPAM", "Nothing selected");
-			
+				Log.i("OPAM", "Nothing selected");	
 			}
 		}
 }
