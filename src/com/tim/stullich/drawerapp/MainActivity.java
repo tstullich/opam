@@ -181,7 +181,7 @@ public class MainActivity extends FragmentActivity {
 					R.layout.drawer_list_item, 
 					listOptions));
 			
-			this.listView.setOnItemClickListener(new DrawerItemClickListener(act, context));
+			this.listView.setOnItemClickListener(new DrawerItemClickListener(context));
 			
 			setUpActionbar(act);
 		}
@@ -215,9 +215,8 @@ public class MainActivity extends FragmentActivity {
 			//More nested classes
 			class DrawerItemClickListener implements ListView.OnItemClickListener {
 				private Context mCtx;
-				private Activity mAct;
 			
-				public DrawerItemClickListener(Activity act, Context ctx) {
+				public DrawerItemClickListener(Context ctx) {
 					mCtx = ctx;
 				}
 			
