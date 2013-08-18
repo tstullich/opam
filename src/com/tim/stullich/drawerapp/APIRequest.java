@@ -48,7 +48,7 @@ public class APIRequest {
 	public Gson execute() throws IOException {
 		URL url = new URL(FINAL_ADDRESS);
 		URLConnection urlConnection = url.openConnection();
-		InputStream in = urlConnection.getInputStream();
+		//InputStream in = urlConnection.getInputStream();
 		return null;
 	}
 }

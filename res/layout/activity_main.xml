@@ -35,9 +35,9 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:choiceMode="singleChoice"
-        android:divider="@android:color/white"
+        android:divider="@color/oracle_red"
         android:dividerHeight="1px"
         android:background="#111" 
-        android:overScrollMode="always"
+        android:overScrollMode="never"
         />
 </android.support.v4.widget.DrawerLayout>
