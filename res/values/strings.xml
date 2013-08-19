@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">Oracle Privileged Account Manager</string>
     <string name="app_name_short">OPAM</string>
     <string name="trademark_title">Oracle Priviliged Account Manager</string>
