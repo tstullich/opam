@@ -18,6 +18,10 @@
     <string name="login_activity_button">Login</string>
     <string name="logout_option">Logout</string>
     <string name="login_server_spinner_prompt">Choose a server</string>
+    <string name="login_image_button_description">Add Button</string>
+    <string name="add_server_alert_title">Input The Server Address And Port</string>
+    <string name="add_server_address_hint">Myopamserver.com</string>
+    <string name="add_port_hint">Port</string>
     
     <string-array name="drawer_list_names">
         <item>My Accounts</item>
