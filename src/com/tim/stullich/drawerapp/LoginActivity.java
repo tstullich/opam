@@ -81,7 +81,7 @@ public class LoginActivity extends FragmentActivity {
 		if (size == 1) {
 			serverNames = new ArrayList<String>(size);
 			Log.i("OPAM", "Resource size " + size);
-			serverNames.add(0, "Choose A Server");
+			serverNames.add(0, "No Server Selected...");
 			Log.i("OPAM", serverNames.toString());
 			return serverNames;
 		}
