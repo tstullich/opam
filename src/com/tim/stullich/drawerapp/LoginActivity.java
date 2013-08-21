@@ -113,7 +113,7 @@ public class LoginActivity extends FragmentActivity {
 						//Intent i = new Intent(LoginActivity.this, MainActivity.class);
 						//i.putExtra("userName", userNameField.getText().toString());
 						//LoginActivity.this.startActivity(i);
-				    APIRequest req = new APIRequest(act, APIRequest.DEBUG_MODE);
+				    APIRequestHandler req = new APIRequestHandler(act, APIRequestHandler.DEBUG_MODE);
 				    req.execute();
 				}
 			}
