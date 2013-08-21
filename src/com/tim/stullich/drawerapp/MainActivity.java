@@ -101,7 +101,7 @@ public class MainActivity extends FragmentActivity {
 		@Override
 		public int getCount() {
 			// Show 3 total pages.
-			return 3;
+			return 1;
 		}
 
 		@Override
@@ -110,10 +110,6 @@ public class MainActivity extends FragmentActivity {
 			switch (position) {
 			case 0:
 				return getString(R.string.title_accounts_section).toUpperCase(l);
-			case 1:
-				return getString(R.string.title_targets_section).toUpperCase(l);
-			case 2:
-				return getString(R.string.title_section3).toUpperCase(l);
 			}
 			return null;
 		}
@@ -136,7 +132,7 @@ public class MainActivity extends FragmentActivity {
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_main_dummy,
+			View rootView = inflater.inflate(R.layout.main_fragment,
 					container, false);
 			TextView dummyTextView = (TextView) rootView
 					.findViewById(R.id.section_label);

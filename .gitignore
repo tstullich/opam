@@ -2,3 +2,6 @@ bin/
 /bin/
 /bin
 gen/
+.classpath
+.settings
+.settings/

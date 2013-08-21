@@ -110,9 +110,11 @@ public class LoginActivity extends FragmentActivity {
 				switch (v.getId()) {
 				//TODO Implement actual login logic	
 				case R.id.login_button :
-						Intent i = new Intent(LoginActivity.this, MainActivity.class);
-						i.putExtra("userName", userNameField.getText().toString());
-						LoginActivity.this.startActivity(i);
+						//Intent i = new Intent(LoginActivity.this, MainActivity.class);
+						//i.putExtra("userName", userNameField.getText().toString());
+						//LoginActivity.this.startActivity(i);
+				    APIRequest req = new APIRequest(act, APIRequest.DEBUG_MODE);
+				    req.execute();
 				}
 			}
 		}
