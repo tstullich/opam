@@ -1,6 +1,8 @@
-package com.tim.stullich.drawerapp;
+package com.tim.stullich.opam;
 
 import java.util.Locale;
+
+import com.tim.stullich.drawerapp.R;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -44,7 +46,8 @@ public class MainActivity extends FragmentActivity {
 	 */
 	private ViewPager mViewPager;
 	private SideDrawer mLeftDrawer;
-	private ActionBarDrawerToggle drawerToggle; 
+	private ActionBarDrawerToggle drawerToggle;
+	private Activity act;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +70,8 @@ public class MainActivity extends FragmentActivity {
 				(DrawerLayout) findViewById(R.id.drawer_layout));
 		
 		getActionBar().setIcon(R.drawable.oracle_icon);
+		
+		act = this;
 	}
 
 	@Override
@@ -220,6 +225,10 @@ public class MainActivity extends FragmentActivity {
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {					
 					if (position == listOptions.length - 1) {
 						finish();
+					}
+					else if (position == 2) {
+						APIRequestHandler req = new APIRequestHandler(act, APIRequestHandler.DEBUG_MODE);
+					    req.execute();
 					}
 					Toast.makeText(mCtx, "Clicked Item", Toast.LENGTH_SHORT).show();
 				}

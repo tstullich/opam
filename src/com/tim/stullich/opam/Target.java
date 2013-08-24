@@ -1,4 +1,4 @@
-package com.tim.stullich.drawerapp;
+package com.tim.stullich.opam;
 
 /**
  * Wrapper class in order to facilitate JSON parsing
