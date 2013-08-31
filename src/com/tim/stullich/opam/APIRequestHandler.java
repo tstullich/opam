@@ -1,6 +1,8 @@
 package com.tim.stullich.opam;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -24,6 +26,7 @@ import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
@@ -32,12 +35,17 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.internal.bind.JsonTreeReader;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import android.app.Activity;
+import android.content.Entity;
 import android.os.AsyncTask;
 import android.util.JsonReader;
 import android.util.Log;
@@ -57,6 +65,10 @@ public class APIRequestHandler extends AsyncTask<Void, Void, Boolean>{
 	private HttpClient client;
 	private HttpGet request;
 	private boolean success;
+	private transient String userName;
+	private transient String password;
+	private AccountCollection col;
+	
 	
 	//private static final String USER_PREFS_FILE = "UserPrefs";
 	
@@ -84,20 +96,12 @@ public class APIRequestHandler extends AsyncTask<Void, Void, Boolean>{
 		}*/
 	}
 		
-	public boolean login() {
-		try {
-			client.execute(request);
-		} catch (ClientProtocolException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return true;
-	}
-
-    
+    public void setLoginInfo(String userName, String password)
+    {
+    	this.userName = userName;
+    	this.password = password;
+    }
+	
     /* (non-Javadoc)
      * @see android.os.AsyncTask#doInBackground(Params[])
      */
@@ -108,11 +112,30 @@ public class APIRequestHandler extends AsyncTask<Void, Void, Boolean>{
         HttpResponse response = null;
         Log.i("OPAM", "Attempting connection");
         try {            
-            get = new HttpGet("https://192.168.0.27/opam/");
+            get = new HttpGet("https://192.168.0.27/opam/ui/myaccounts/search?");
             response = client.execute(get);
-            Log.i("OPAM", "Client executed");
             if (response != null) {
-                Log.i("OPAM", response.getStatusLine().toString());                
+                Log.i("OPAM", response.getStatusLine().toString()); 
+                
+                BufferedReader in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+                Gson g = new GsonBuilder().create();
+                
+                String input = "";
+                
+                while ((input = in.readLine()) != null) {
+                	Log.i("OPAM", input);
+                }
+                JSONObject obj;
+                try {
+					obj = new JSONObject(input);
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+               
+                Log.i("OPAM", "Names");
+                
+                in.close();
                 return true;
             }
             
@@ -149,16 +172,15 @@ public class APIRequestHandler extends AsyncTask<Void, Void, Boolean>{
                 registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
                 registry.register(new Scheme("https", sf, SERVER_PORT));
                 
-                CredentialsProvider credProvider = new BasicCredentialsProvider();
+                CredentialsProvider credProvider = new BasicCredentialsProvider();                
                 credProvider.setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),
-                    new UsernamePasswordCredentials("opam_admin", "welcome1"));
+                    new UsernamePasswordCredentials(userName, password));
 
                 ClientConnectionManager ccm = new ThreadSafeClientConnManager(params, registry);
                 
                 DefaultHttpClient cli = new DefaultHttpClient(ccm, params);
                 cli.setCredentialsProvider(credProvider);
                 
-                Log.i("OPAM", "Client returned");
                 return cli;
                 
             } catch (Exception e) {

@@ -35,6 +35,7 @@ public class LoginActivity extends FragmentActivity {
 	private ArrayList<String> serverNames;
 	private ArrayAdapter<String> serverNamesAdapter;
 	private EditText userNameField;
+	private EditText passwordField;
 	private static final String USER_PREFS = "UserPrefs";
 	private static final String SERVER_NAMES = "serverNames";
 	
@@ -44,6 +45,7 @@ public class LoginActivity extends FragmentActivity {
 		setContentView(R.layout.activity_login);
 		
 		userNameField = (EditText) findViewById(R.id.username_edit_text);
+		passwordField = (EditText) findViewById(R.id.password_edit_text);
 		
 		addServerButton = (ImageButton) findViewById(R.id.add_server_button);
 		addServerButton.setOnClickListener(new ServerAddOnClickListener(this));
@@ -115,8 +117,12 @@ public class LoginActivity extends FragmentActivity {
 				switch (v.getId()) {
 				//TODO Implement actual login logic	
 				case R.id.login_button :
-						Intent i = new Intent(LoginActivity.this, MainActivity.class);
-						LoginActivity.this.startActivity(i);
+						//Intent i = new Intent(LoginActivity.this, MainActivity.class);
+						//LoginActivity.this.startActivity(i);
+						APIRequestHandler h = new APIRequestHandler(act, APIRequestHandler.DEBUG_MODE);
+						h.setLoginInfo(userNameField.getText().toString(),
+								passwordField.getText().toString());
+						h.execute();
 				}
 			}
 		}
