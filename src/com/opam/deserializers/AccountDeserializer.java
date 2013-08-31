@@ -10,7 +10,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.opam.request.types.Account;
 
-public class AccountDeserializer implements JsonDeserializer<Account>{
+public class AccountDeserializer implements JsonDeserializer<Account> {
 
 	@Override
 	public Account deserialize(JsonElement json, Type arg1,

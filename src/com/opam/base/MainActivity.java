@@ -48,7 +48,7 @@ public class MainActivity extends FragmentActivity {
 	private SideDrawer mLeftDrawer;
 	private ActionBarDrawerToggle drawerToggle;
 	private Activity act;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -62,25 +62,23 @@ public class MainActivity extends FragmentActivity {
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
-		
-		mLeftDrawer = new SideDrawer(
-				this, 
-				MainActivity.this, 
+
+		mLeftDrawer = new SideDrawer(this, MainActivity.this,
 				(ListView) findViewById(R.id.left_drawer),
 				(DrawerLayout) findViewById(R.id.drawer_layout));
-		
+
 		getActionBar().setIcon(R.drawable.oracle_icon);
-		
+
 		act = this;
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.layout.actionbar_menu, menu);
-	    return true;
-	 }
-	
+		inflater.inflate(R.layout.actionbar_menu, menu);
+		return true;
+	}
+
 	/**
 	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
 	 * one of the sections/tabs/pages.
@@ -114,15 +112,16 @@ public class MainActivity extends FragmentActivity {
 			Locale l = Locale.getDefault();
 			switch (position) {
 			case 0:
-				return getString(R.string.title_accounts_section).toUpperCase(l);
+				return getString(R.string.title_accounts_section)
+						.toUpperCase(l);
 			}
 			return null;
 		}
 	}
 
 	/**
-	 * A dummy fragment representing a section of the app, but simply
-	 * displays dummy text.
+	 * A dummy fragment representing a section of the app, but simply displays
+	 * dummy text.
 	 */
 	public static class DummySectionFragment extends Fragment {
 		/**
@@ -137,8 +136,8 @@ public class MainActivity extends FragmentActivity {
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.main_fragment,
-					container, false);
+			View rootView = inflater.inflate(R.layout.main_fragment, container,
+					false);
 			TextView dummyTextView = (TextView) rootView
 					.findViewById(R.id.section_label);
 			dummyTextView.setText(Integer.toString(getArguments().getInt(
@@ -149,88 +148,91 @@ public class MainActivity extends FragmentActivity {
 
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
-	    super.onPostCreate(savedInstanceState);
-	    drawerToggle.syncState();
+		super.onPostCreate(savedInstanceState);
+		drawerToggle.syncState();
 	}
 
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
-	    super.onConfigurationChanged(newConfig);
-	    drawerToggle.onConfigurationChanged(newConfig);
+		super.onConfigurationChanged(newConfig);
+		drawerToggle.onConfigurationChanged(newConfig);
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-	    if (drawerToggle.onOptionsItemSelected(item)) {
-	        return true;
-	    }
-	    return super.onOptionsItemSelected(item);
+		if (drawerToggle.onOptionsItemSelected(item)) {
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
-	
+
 	private class SideDrawer extends ListView {
 		private String[] listOptions;
 		private DrawerLayout drawerLayout;
 		private ListView listView;
-		
-		public SideDrawer(Context context, Activity act, ListView listView, DrawerLayout layout) {
+
+		public SideDrawer(Context context, Activity act, ListView listView,
+				DrawerLayout layout) {
 			super(context);
-			
-			listOptions = getResources().getStringArray(R.array.drawer_list_names);
+
+			listOptions = getResources().getStringArray(
+					R.array.drawer_list_names);
 			Log.i("DrawerList", "List Size " + listOptions.length);
 			drawerLayout = layout;
 			this.listView = listView;
-			this.listView.setAdapter(new ArrayAdapter<String>(
-					context, 
-					R.layout.drawer_list_item, 
-					listOptions));
-			
-			this.listView.setOnItemClickListener(new DrawerItemClickListener(context));
-			
+			this.listView.setAdapter(new ArrayAdapter<String>(context,
+					R.layout.drawer_list_item, listOptions));
+
+			this.listView.setOnItemClickListener(new DrawerItemClickListener(
+					context));
+
 			setUpActionbar(act);
 		}
-		
-		private void setUpActionbar(Activity act) {
-			drawerToggle = new ActionBarDrawerToggle(act, 
-					drawerLayout, 
-					R.drawable.ic_drawer, 
-					R.string.open_drawer_description, 
-					R.string.close_drawer_description
-					) {
-				/** Called when a drawer has settled in a completely closed state. */
-	            public void onDrawerClosed(View view) {
-	                getActionBar().setTitle(R.string.app_name_short);
-	            }
 
-	            /** Called when a drawer has settled in a completely open state. */
-	            public void onDrawerOpened(View drawerView) {
-	               getActionBar().setTitle(R.string.drawer_open);
-	            }
+		private void setUpActionbar(Activity act) {
+			drawerToggle = new ActionBarDrawerToggle(act, drawerLayout,
+					R.drawable.ic_drawer, R.string.open_drawer_description,
+					R.string.close_drawer_description) {
+				/**
+				 * Called when a drawer has settled in a completely closed
+				 * state.
+				 */
+				public void onDrawerClosed(View view) {
+					getActionBar().setTitle(R.string.app_name_short);
+				}
+
+				/** Called when a drawer has settled in a completely open state. */
+				public void onDrawerOpened(View drawerView) {
+					getActionBar().setTitle(R.string.drawer_open);
+				}
 			};
-			
+
 			drawerLayout.setDrawerListener(drawerToggle);
-			
+
 			act.getActionBar().setDisplayHomeAsUpEnabled(true);
 			act.getActionBar().setHomeButtonEnabled(true);
 		}
+
 		class DrawerItemClickListener implements ListView.OnItemClickListener {
 			private Context mCtx;
-			
+
 			public DrawerItemClickListener(Context ctx) {
 				mCtx = ctx;
 			}
-			
+
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {					
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
 				if (position == listOptions.length - 1) {
 					finish();
-				}
-				else if (position == 2) {
-					APIRequestHandler req = new APIRequestHandler(act, APIRequestHandler.DEBUG_MODE);
+				} else if (position == 2) {
+					APIRequestHandler req = new APIRequestHandler(act,
+							APIRequestHandler.DEBUG_MODE);
 					req.execute();
 				}
 				Toast.makeText(mCtx, "Clicked Item", Toast.LENGTH_SHORT).show();
 			}
-			
+
 		}
 	}
 }

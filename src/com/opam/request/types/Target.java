@@ -2,15 +2,16 @@ package com.opam.request.types;
 
 /**
  * Wrapper class in order to facilitate JSON parsing
+ * 
  * @author Tim
- *
+ * 
  */
 public class Target {
 	String targetType;
 	String displayName;
 	Attribute[] basicAttributes;
 	Attribute[] advancedAttributes;
-	
+
 	public class Attribute {
 		String name;
 		String type;

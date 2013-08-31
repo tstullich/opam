@@ -2,8 +2,9 @@ package com.opam.request.types;
 
 /**
  * Wrapper class in order to facilitate JSON parsing
+ * 
  * @author Tim
- *
+ * 
  */
 public class Account {
 	private String uri;
@@ -17,8 +18,9 @@ public class Account {
 	private String targetName;
 	private String targetType;
 	private String domain;
-	
-	public Account(){};
+
+	public Account() {
+	};
 
 	public String getUri() {
 		return uri;

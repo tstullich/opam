@@ -5,8 +5,9 @@ import java.util.ArrayList;
 public class AccountCollection {
 	private ArrayList<Account> AccountCollection;
 	private int count;
-	
-	public AccountCollection(){};
+
+	public AccountCollection() {
+	};
 
 	public ArrayList<Account> getAccountCollection() {
 		return AccountCollection;

@@ -1,4 +1,5 @@
 package com.opam.base;
+
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -15,47 +16,51 @@ import javax.net.ssl.X509TrustManager;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 
 /**
- * Class that creates an SSL Socket Object which trusts
- * all certificates.
+ * Class that creates an SSL Socket Object which trusts all certificates.
+ * 
  * @author Tim
- *
+ * 
  */
 public class MySSLSocketFactory extends SSLSocketFactory {
-    SSLContext sslContext = SSLContext.getInstance("TLS");
+	SSLContext sslContext = SSLContext.getInstance("TLS");
 
-    public MySSLSocketFactory(KeyStore truststore) throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException, UnrecoverableKeyException {
-        super(truststore);
+	public MySSLSocketFactory(KeyStore truststore)
+			throws NoSuchAlgorithmException, KeyManagementException,
+			KeyStoreException, UnrecoverableKeyException {
+		super(truststore);
 
-        TrustManager tm = new X509TrustManager() {
-            @Override
-            public void checkClientTrusted(
-                    java.security.cert.X509Certificate[] chain, String authType)
-                    throws java.security.cert.CertificateException {
+		TrustManager tm = new X509TrustManager() {
+			@Override
+			public void checkClientTrusted(
+					java.security.cert.X509Certificate[] chain, String authType)
+					throws java.security.cert.CertificateException {
 
-            }
+			}
 
-            @Override
-            public void checkServerTrusted(
-                    java.security.cert.X509Certificate[] chain, String authType)
-                    throws java.security.cert.CertificateException {                
-            }
+			@Override
+			public void checkServerTrusted(
+					java.security.cert.X509Certificate[] chain, String authType)
+					throws java.security.cert.CertificateException {
+			}
 
-            @Override
-            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                return null;
-            }
-        };
+			@Override
+			public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+				return null;
+			}
+		};
 
-        sslContext.init(null, new TrustManager[] { tm }, null);
-    }
+		sslContext.init(null, new TrustManager[] { tm }, null);
+	}
 
-    @Override
-    public Socket createSocket(Socket socket, String host, int port, boolean autoClose) throws IOException, UnknownHostException {
-        return sslContext.getSocketFactory().createSocket(socket, host, port, autoClose);
-    }
+	@Override
+	public Socket createSocket(Socket socket, String host, int port,
+			boolean autoClose) throws IOException, UnknownHostException {
+		return sslContext.getSocketFactory().createSocket(socket, host, port,
+				autoClose);
+	}
 
-    @Override
-    public Socket createSocket() throws IOException {
-        return sslContext.getSocketFactory().createSocket();
-    }
+	@Override
+	public Socket createSocket() throws IOException {
+		return sslContext.getSocketFactory().createSocket();
+	}
 }

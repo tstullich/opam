@@ -6,18 +6,20 @@ public class ServerStatus {
 
 	public String Requestor;
 	ArrayList<String> RequestorGroups;
-	
-	public ServerStatus(){};
-	
+
+	public ServerStatus() {
+	};
+
 	public int getStatusCodeInt() {
 		return ServerState.getStatusCode();
 	}
-	
-	public static class ServerState{
+
+	public static class ServerState {
 		String Status;
 		static int StatusCode;
-		
-		public ServerState(){}
+
+		public ServerState() {
+		}
 
 		public String getStatus() {
 			return Status;
