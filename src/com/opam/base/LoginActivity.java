@@ -8,9 +8,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -22,12 +20,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 public class LoginActivity extends FragmentActivity {
 
-	private TextView t;
 	private Button loginButton;
 	private Spinner serverList;
 	private ImageButton addServerButton;
@@ -52,6 +48,8 @@ public class LoginActivity extends FragmentActivity {
 		
 		loginButton = (Button) findViewById(R.id.login_button);
 		loginButton.setOnClickListener(new LoginOnClickListener());
+		//TODO Make TextChangeListener
+		//loginButton.setEnabled(false);
 		
 		serverList = (Spinner) findViewById(R.id.servers_spinner);
 		
@@ -119,10 +117,12 @@ public class LoginActivity extends FragmentActivity {
 				case R.id.login_button :
 						//Intent i = new Intent(LoginActivity.this, MainActivity.class);
 						//LoginActivity.this.startActivity(i);
-						APIRequestHandler h = new APIRequestHandler(act, APIRequestHandler.DEBUG_MODE);
+						APIRequestHandler h = new APIRequestHandler(act, 
+								APIRequestHandler.ACCOUNTS_REQUEST);
 						h.setLoginInfo(userNameField.getText().toString(),
 								passwordField.getText().toString());
 						h.execute();
+						
 				}
 			}
 		}
@@ -194,5 +194,10 @@ public class LoginActivity extends FragmentActivity {
 			public void onNothingSelected(AdapterView<?> arg0) {
 				Log.i("OPAM", "Nothing selected");	
 			}
+		}
+		
+		//TODO Fully implement class
+		private class OnTextChangedListener{
+			
 		}
 }

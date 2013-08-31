@@ -121,7 +121,7 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	/**
-	 * A dummy fragment representing a section of the app, but that simply
+	 * A dummy fragment representing a section of the app, but simply
 	 * displays dummy text.
 	 */
 	public static class DummySectionFragment extends Fragment {
@@ -212,27 +212,25 @@ public class MainActivity extends FragmentActivity {
 			act.getActionBar().setDisplayHomeAsUpEnabled(true);
 			act.getActionBar().setHomeButtonEnabled(true);
 		}
+		class DrawerItemClickListener implements ListView.OnItemClickListener {
+			private Context mCtx;
 			
-			//More nested classes
-			class DrawerItemClickListener implements ListView.OnItemClickListener {
-				private Context mCtx;
-			
-				public DrawerItemClickListener(Context ctx) {
-					mCtx = ctx;
-				}
-			
-				@Override
-				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {					
-					if (position == listOptions.length - 1) {
-						finish();
-					}
-					else if (position == 2) {
-						APIRequestHandler req = new APIRequestHandler(act, APIRequestHandler.DEBUG_MODE);
-					    req.execute();
-					}
-					Toast.makeText(mCtx, "Clicked Item", Toast.LENGTH_SHORT).show();
-				}
-			
+			public DrawerItemClickListener(Context ctx) {
+				mCtx = ctx;
 			}
+			
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {					
+				if (position == listOptions.length - 1) {
+					finish();
+				}
+				else if (position == 2) {
+					APIRequestHandler req = new APIRequestHandler(act, APIRequestHandler.DEBUG_MODE);
+					req.execute();
+				}
+				Toast.makeText(mCtx, "Clicked Item", Toast.LENGTH_SHORT).show();
+			}
+			
 		}
+	}
 }

@@ -13,6 +13,13 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.apache.http.conn.ssl.SSLSocketFactory;
+
+/**
+ * Class that creates an SSL Socket Object which trusts
+ * all certificates.
+ * @author Tim
+ *
+ */
 public class MySSLSocketFactory extends SSLSocketFactory {
     SSLContext sslContext = SSLContext.getInstance("TLS");
 
@@ -24,21 +31,17 @@ public class MySSLSocketFactory extends SSLSocketFactory {
             public void checkClientTrusted(
                     java.security.cert.X509Certificate[] chain, String authType)
                     throws java.security.cert.CertificateException {
-                // TODO Auto-generated method stub
-                
+
             }
 
             @Override
             public void checkServerTrusted(
                     java.security.cert.X509Certificate[] chain, String authType)
-                    throws java.security.cert.CertificateException {
-                // TODO Auto-generated method stub
-                
+                    throws java.security.cert.CertificateException {                
             }
 
             @Override
             public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                // TODO Auto-generated method stub
                 return null;
             }
         };

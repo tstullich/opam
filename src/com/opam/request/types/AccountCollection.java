@@ -3,16 +3,10 @@ package com.opam.request.types;
 import java.util.ArrayList;
 
 public class AccountCollection {
+	private ArrayList<Account> AccountCollection;
+	private int count;
 	
 	public AccountCollection(){};
-
-	ArrayList<Account> AccountCollection;
-	int count;
-	
-	@Override
-	public String toString() {
-		return "what the dicks";
-	}
 
 	public ArrayList<Account> getAccountCollection() {
 		return AccountCollection;

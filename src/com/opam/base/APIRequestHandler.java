@@ -25,12 +25,15 @@ import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.opam.deserializers.AccountDeserializer;
+import com.opam.request.types.Account;
 import com.opam.request.types.AccountCollection;
-import com.opam.request.types.ServerStatus;
-
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -38,20 +41,22 @@ import android.util.Log;
 public class APIRequestHandler extends AsyncTask<Void, Void, Boolean>{
 
 	//TODO Clean up this mess
+	public static final int DEBUG_MODE = -1;
 	public static final int SERVER_STATUS = 0;
 	public static final int TARGET_REQUEST = 1;
 	public static final int TARGET_ATTRIBUTE_REQUEST = 2;
-	public static final int DEBUG_MODE = 3;
+	public static final int ACCOUNTS_REQUEST = 3;
 
 	private static String SERVER_ADDRESS;
 	private static int SERVER_PORT;
+	private String requestAddress;
 	
+	private HttpResponse response;
 	private HttpClient client;
-	private HttpGet request;
-	private boolean success;
 	private transient String userName;
 	private transient String password;
-	private AccountCollection col;
+	private ProgressDialog dialog;
+	private Context ctx;
 	
 	
 	//private static final String USER_PREFS_FILE = "UserPrefs";
@@ -63,21 +68,28 @@ public class APIRequestHandler extends AsyncTask<Void, Void, Boolean>{
 	 */
 	public APIRequestHandler(Activity act, final int apiRequestType) {
 		//SharedPreferences settings = act.getSharedPreferences(USER_PREFS_FILE, 0);
-		SERVER_ADDRESS = "https://192.168.0.27";
+		//TODO Get Server info from Input Fields
+		SERVER_ADDRESS = "192.168.0.27";
 		SERVER_PORT = 18102;
-		success = false;
-						
+		
+		ctx = act;
+		dialog = new ProgressDialog(ctx);
+		
 		//TODO Build more cases... maybe even a better way to implement this.
-		/*switch (apiType) {
+		StringBuilder sb = new StringBuilder();
+		switch (apiRequestType) {
 			case SERVER_STATUS : 
-				StringBuilder sb = new StringBuilder();
-				sb.append("https://");
-				sb.append(SERVER_ADDRESS + ":");
-				sb.append(SERVER_PORT);
-				sb.append("/opam/");
-				FINAL_ADDRESS = sb.toString();
+				sb.append("https://" + SERVER_ADDRESS + ":" + SERVER_PORT + "/opam/");
+				requestAddress = sb.toString();
 				break;
-		}*/
+			case ACCOUNTS_REQUEST :
+				sb.append("https://" + SERVER_ADDRESS + ":" + SERVER_PORT + "/opam/ui/myaccounts/search?");
+				requestAddress = sb.toString();
+				break;
+			case DEBUG_MODE :
+				requestAddress = "https://" + SERVER_ADDRESS + ":" + SERVER_PORT + "/opam/";
+				break;
+		}
 	}
 		
     public void setLoginInfo(String userName, String password)
@@ -86,35 +98,60 @@ public class APIRequestHandler extends AsyncTask<Void, Void, Boolean>{
     	this.password = password;
     }
 	
+    protected void onPreExecute() {
+        this.dialog.setMessage("Loading...");
+        this.dialog.show();
+    }
+    
+    @Override
+    protected void onPostExecute(final Boolean success) {
+        if (dialog.isShowing() && success) {
+            dialog.dismiss();
+        }
+        else {
+        	dialog.dismiss();
+        	AlertDialog.Builder builder = new Builder(ctx);
+        	builder.setTitle("Request Unsuccessful");
+        	builder.setMessage(response.getStatusLine().toString());
+        	builder.setPositiveButton("OK", null);
+        	builder.create().show();
+        }
+    }
+    
     /* (non-Javadoc)
      * @see android.os.AsyncTask#doInBackground(Params[])
      */
     @Override
     protected Boolean doInBackground(Void... params) {
-        client = new MyHttpClient().iniHttpClient();
-        HttpGet get = null;
-        HttpResponse response = null;
-        Log.i("OPAM", "Attempting connection");
+        client = new OPAMHttpClient().iniHttpClient();
+        HttpGet request = null;
+        response = null;
         try {            
-            get = new HttpGet("https://192.168.0.27/opam/");
-            response = client.execute(get);
-            if (response != null) {
+            request = new HttpGet(requestAddress);
+            response = client.execute(request);
+            if (response != null && response.getStatusLine().toString().contains("200")) {
             	String entity = EntityUtils.toString(response.getEntity());
                 Log.i("OPAM", response.getStatusLine().toString());
                 Log.i("OPAM", entity);
                 
-                Gson g = new GsonBuilder().create();
-                ServerStatus status = g.fromJson(entity, ServerStatus.class);
+                GsonBuilder g = new GsonBuilder();
                 
-                if (status == null) {
+                //g.registerTypeAdapter(AccountDeserializer.class, new AccountDeserializer());
+                AccountCollection accounts = g.create().fromJson(entity, AccountCollection.class);
+                
+                if (accounts == null) {
                 	Log.i("OPAM", "Sigh...");
                 }
                 else {
-                	Log.i("OPAM", "Requestor: " + status.Requestor);
-                	Log.i("OPAM", "Status Code: " + status.getStatusCodeInt());
-                }
-                                
+                	Log.i("OPAM", "Count: " + accounts.getCount());
+                	for (Account acc : accounts.getAccountCollection()) {
+                		Log.i("OPAM", "Account Name: " + acc.getAccountName());
+                	}
+                }           
                 return true;
+            }
+            else {
+            	return false;
             }
             
         } catch (ClientProtocolException e) {
@@ -132,7 +169,7 @@ public class APIRequestHandler extends AsyncTask<Void, Void, Boolean>{
      * @author Tim Stullich
      *
      */
-    private class MyHttpClient {
+    private class OPAMHttpClient {
         public HttpClient iniHttpClient() {
             try {
                 

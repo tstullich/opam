@@ -6,24 +6,19 @@ package com.opam.request.types;
  *
  */
 public class Account {
-	String uri;
-	String accountUID;
-	String accountName;
-	String description;
-	String status;
-	String accountlevelstatus;
-	boolean shared;
-    String targetUID;
-	String targetName;
-	String targetType;
-	String domain;
+	private String uri;
+	private String accountUID;
+	private String accountName;
+	private String description;
+	private String status;
+	private String accountlevelstatus;
+	private boolean shared;
+	private String targetUID;
+	private String targetName;
+	private String targetType;
+	private String domain;
 	
 	public Account(){};
-	
-	@Override
-	public String toString() {
-		return "What the dicks";
-	}
 
 	public String getUri() {
 		return uri;
