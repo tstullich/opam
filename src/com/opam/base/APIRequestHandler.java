@@ -1,18 +1,8 @@
-package com.tim.stullich.opam;
+package com.opam.base;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.security.KeyStore;
 
-import javax.net.ssl.HttpsURLConnection;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.auth.AuthScope;
@@ -26,7 +16,6 @@ import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
@@ -34,20 +23,15 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
-import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.internal.bind.JsonTreeReader;
+import com.opam.request.types.AccountCollection;
+import com.opam.request.types.ServerStatus;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import android.app.Activity;
-import android.content.Entity;
 import android.os.AsyncTask;
-import android.util.JsonReader;
 import android.util.Log;
 
 
@@ -112,30 +96,24 @@ public class APIRequestHandler extends AsyncTask<Void, Void, Boolean>{
         HttpResponse response = null;
         Log.i("OPAM", "Attempting connection");
         try {            
-            get = new HttpGet("https://192.168.0.27/opam/ui/myaccounts/search?");
+            get = new HttpGet("https://192.168.0.27/opam/");
             response = client.execute(get);
             if (response != null) {
-                Log.i("OPAM", response.getStatusLine().toString()); 
+            	String entity = EntityUtils.toString(response.getEntity());
+                Log.i("OPAM", response.getStatusLine().toString());
+                Log.i("OPAM", entity);
                 
-                BufferedReader in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
                 Gson g = new GsonBuilder().create();
+                ServerStatus status = g.fromJson(entity, ServerStatus.class);
                 
-                String input = "";
-                
-                while ((input = in.readLine()) != null) {
-                	Log.i("OPAM", input);
+                if (status == null) {
+                	Log.i("OPAM", "Sigh...");
                 }
-                JSONObject obj;
-                try {
-					obj = new JSONObject(input);
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-               
-                Log.i("OPAM", "Names");
-                
-                in.close();
+                else {
+                	Log.i("OPAM", "Requestor: " + status.Requestor);
+                	Log.i("OPAM", "Status Code: " + status.getStatusCodeInt());
+                }
+                                
                 return true;
             }
             

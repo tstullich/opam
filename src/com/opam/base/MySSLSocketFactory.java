@@ -1,4 +1,4 @@
-package com.tim.stullich.opam;
+package com.opam.base;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;

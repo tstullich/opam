@@ -1,4 +1,4 @@
-package com.tim.stullich.opam;
+package com.opam.base;
 
 import java.util.ArrayList;
 

@@ -1,4 +1,4 @@
-package com.tim.stullich.opam;
+package com.opam.request.types;
 
 /**
  * Wrapper class in order to facilitate JSON parsing

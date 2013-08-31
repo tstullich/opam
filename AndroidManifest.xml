@@ -13,11 +13,11 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.tim.stullich.opam.MainActivity"
+            android:name="com.opam.base.MainActivity"
             android:label="@string/app_name_short" >
         </activity>
         <activity 
-            android:name="com.tim.stullich.opam.LoginActivity"
+            android:name="com.opam.base.LoginActivity"
             android:label="@string/app_name_short"
             android:theme="@android:style/Theme.NoTitleBar" >
             <intent-filter>
