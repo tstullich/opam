@@ -8,15 +8,17 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity$DummySectionFragment" >
-
-    <TextView
-        android:id="@+id/section_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
         
     <ExpandableListView
          android:id="@+id/accounts_list"
          android:layout_width="fill_parent"
-         android:layout_height="wrap_content"
-         android:layout_below="@id/section_label" />
+         android:layout_height="wrap_content" />
+    <ProgressBar 
+        android:id="@+id/accounts_load_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:indeterminate="true" />
+
 </RelativeLayout>

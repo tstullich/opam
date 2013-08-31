@@ -1,13 +1,19 @@
 package com.opam.base;
 
+import java.io.IOException;
 import java.util.Locale;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.opam.request.types.AccountsCollection;
 import com.tim.stullich.drawerapp.R;
 
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
@@ -22,9 +28,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView.FindListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ExpandableListAdapter;
+import android.widget.ExpandableListView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.support.v4.widget.DrawerLayout;
@@ -48,6 +59,7 @@ public class MainActivity extends FragmentActivity {
 	private SideDrawer mLeftDrawer;
 	private ActionBarDrawerToggle drawerToggle;
 	private Activity act;
+	private SimpleExpandableListAdapter accountsListAdapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -94,16 +106,15 @@ public class MainActivity extends FragmentActivity {
 			// getItem is called to instantiate the fragment for the given page.
 			// Return a DummySectionFragment (defined as a static inner class
 			// below) with the page number as its lone argument.
-			Fragment fragment = new DummySectionFragment();
+			Fragment fragment = new MainSectionFragment();
 			Bundle args = new Bundle();
-			args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
+			args.putInt(MainSectionFragment.ARG_SECTION_NUMBER, position + 1);
 			fragment.setArguments(args);
 			return fragment;
 		}
 
 		@Override
 		public int getCount() {
-			// Show 3 total pages.
 			return 1;
 		}
 
@@ -123,14 +134,16 @@ public class MainActivity extends FragmentActivity {
 	 * A dummy fragment representing a section of the app, but simply displays
 	 * dummy text.
 	 */
-	public static class DummySectionFragment extends Fragment {
+	public static class MainSectionFragment extends Fragment implements AsyncResponse {
 		/**
 		 * The fragment argument representing the section number for this
 		 * fragment.
 		 */
 		public static final String ARG_SECTION_NUMBER = "section_number";
-
-		public DummySectionFragment() {
+		private ProgressBar progress;
+		private SimpleExpandableListAdapter adapter;
+		
+		public MainSectionFragment() {
 		}
 
 		@Override
@@ -138,11 +151,39 @@ public class MainActivity extends FragmentActivity {
 				Bundle savedInstanceState) {
 			View rootView = inflater.inflate(R.layout.main_fragment, container,
 					false);
-			TextView dummyTextView = (TextView) rootView
-					.findViewById(R.id.section_label);
-			dummyTextView.setText(Integer.toString(getArguments().getInt(
-					ARG_SECTION_NUMBER)));
+			progress = (ProgressBar) rootView.findViewById(R.id.accounts_load_progress);
+			progress.animate();
+			
+			createAccountsList();
+			
 			return rootView;
+		}
+
+		private void createAccountsList() {
+			APIRequestHandler handler = new APIRequestHandler(getActivity(), APIRequestHandler.ACCOUNTS_REQUEST);
+			//TODO Fix so credentials get fetched from SharedPrefs or Intent
+			handler.setLoginInfo("olaf", "welcome1");
+			handler.setAsyncDelegate(this);
+			handler.execute();
+		}
+
+		@Override
+		public void processFinish(String json) {
+			ObjectMapper mapper = new ObjectMapper();
+			AccountsCollection accounts = null;
+			try {
+				accounts = mapper.readValue(json, AccountsCollection.class);
+			} catch (JsonParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (JsonMappingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 		}
 	}
 

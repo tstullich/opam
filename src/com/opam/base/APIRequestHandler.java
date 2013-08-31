@@ -2,6 +2,8 @@ package com.opam.base;
 
 import java.io.IOException;
 import java.security.KeyStore;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
@@ -25,10 +27,14 @@ import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
-import com.google.gson.GsonBuilder;
-import com.opam.deserializers.AccountDeserializer;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.deser.std.FromStringDeserializer;
 import com.opam.request.types.Account;
-import com.opam.request.types.AccountCollection;
+import com.opam.request.types.AccountsCollection;
+import com.opam.request.types.AccountWrapper;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -45,6 +51,7 @@ public class APIRequestHandler extends AsyncTask<Void, Void, Boolean> {
 	public static final int TARGET_REQUEST = 1;
 	public static final int TARGET_ATTRIBUTE_REQUEST = 2;
 	public static final int ACCOUNTS_REQUEST = 3;
+	public static final int LOGIN_REQUEST = 0;
 
 	private static String SERVER_ADDRESS;
 	private static int SERVER_PORT;
@@ -54,8 +61,11 @@ public class APIRequestHandler extends AsyncTask<Void, Void, Boolean> {
 	private HttpClient client;
 	private transient String userName;
 	private transient String password;
+	private String json;
 	private ProgressDialog dialog;
 	private Context ctx;
+	
+	private AsyncResponse delegate = null;
 
 	// private static final String USER_PREFS_FILE = "UserPrefs";
 
@@ -109,6 +119,8 @@ public class APIRequestHandler extends AsyncTask<Void, Void, Boolean> {
 	protected void onPostExecute(final Boolean success) {
 		if (dialog.isShowing() && success) {
 			dialog.dismiss();
+			delegate.processFinish(json);
+			
 		} else {
 			dialog.dismiss();
 			AlertDialog.Builder builder = new Builder(ctx);
@@ -124,39 +136,18 @@ public class APIRequestHandler extends AsyncTask<Void, Void, Boolean> {
 	}
 
 	@Override
-	protected Boolean doInBackground(Void... params) {
+	protected Boolean doInBackground(Void... param) {
 		client = new OPAMHttpClient().iniHttpClient();
 		HttpGet request = null;
 		response = null;
 		try {
 			request = new HttpGet(requestAddress);
 			response = client.execute(request);
-			if (response != null
-					&& response.getStatusLine().toString().contains("200")) {
-				String entity = EntityUtils.toString(response.getEntity());
-				Log.i("OPAM", response.getStatusLine().toString());
-				Log.i("OPAM", entity);
-
-				GsonBuilder g = new GsonBuilder();
-
-				// g.registerTypeAdapter(AccountDeserializer.class, new
-				// AccountDeserializer());
-				AccountCollection accounts = g.create().fromJson(entity,
-						AccountCollection.class);
-
-				if (accounts == null) {
-					Log.i("OPAM", "Sigh...");
-				} else {
-					Log.i("OPAM", "Count: " + accounts.getCount());
-					for (Account acc : accounts.getAccountCollection()) {
-						Log.i("OPAM", "Account Name: " + acc.getAccountName());
-					}
-				}
+			if (response != null && response.getStatusLine().toString().contains("200")) {
+				json = EntityUtils.toString(response.getEntity());
+				Log.i("OPAM", response.getStatusLine().toString());				
 				return true;
-			} else {
-				return false;
 			}
-
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -164,7 +155,6 @@ public class APIRequestHandler extends AsyncTask<Void, Void, Boolean> {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		return false;
 	}
 
@@ -210,4 +200,20 @@ public class APIRequestHandler extends AsyncTask<Void, Void, Boolean> {
 			}
 		}
 	}
+	
+	public void setAsyncDelegate(AsyncResponse d){
+		delegate = d;
+	}
+	
+	public static <T> T fromJSON(final TypeReference<T> type,
+		      final String jsonPacket) {
+		   T data = null;
+
+		   try {
+		      data = new ObjectMapper().readValue(jsonPacket, type);
+		   } catch (Exception e) {
+		      // Handle the problem
+		   }
+		   return data;
+		}
 }

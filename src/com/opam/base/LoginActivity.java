@@ -1,16 +1,28 @@
 package com.opam.base;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.opam.request.types.Account;
+import com.opam.request.types.AccountsCollection;
+import com.opam.request.types.ServerStatus;
 import com.tim.stullich.drawerapp.R;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.text.InputFilter.LengthFilter;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -22,8 +34,7 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-public class LoginActivity extends FragmentActivity {
-
+public class LoginActivity extends FragmentActivity implements AsyncResponse {
 	private Button loginButton;
 	private Spinner serverList;
 	private ImageButton addServerButton;
@@ -34,6 +45,7 @@ public class LoginActivity extends FragmentActivity {
 	private EditText passwordField;
 	private static final String USER_PREFS = "UserPrefs";
 	private static final String SERVER_NAMES = "serverNames";
+	private APIRequestHandler h;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -41,15 +53,16 @@ public class LoginActivity extends FragmentActivity {
 		setContentView(R.layout.activity_login);
 
 		userNameField = (EditText) findViewById(R.id.username_edit_text);
+		userNameField.addTextChangedListener(new OnTextChangedListener());
 		passwordField = (EditText) findViewById(R.id.password_edit_text);
+		passwordField.addTextChangedListener(new OnTextChangedListener());
 
 		addServerButton = (ImageButton) findViewById(R.id.add_server_button);
 		addServerButton.setOnClickListener(new ServerAddOnClickListener(this));
 
 		loginButton = (Button) findViewById(R.id.login_button);
-		loginButton.setOnClickListener(new LoginOnClickListener());
-		// TODO Make TextChangeListener
-		// loginButton.setEnabled(false);
+		loginButton.setOnClickListener(new LoginOnClickListener(this));
+		loginButton.setEnabled(false);
 
 		serverList = (Spinner) findViewById(R.id.servers_spinner);
 
@@ -106,30 +119,53 @@ public class LoginActivity extends FragmentActivity {
 
 		return editor.commit();
 	}
+	
+	@Override
+	public void processFinish(String json) {
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+		ServerStatus status = null;
+		try {
+			status= mapper.readValue(json, ServerStatus.class);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		if (status.getStatusCodeInt() == 0) {
+			Intent i = new Intent(LoginActivity.this, MainActivity.class);
+			LoginActivity.this.startActivity(i);
+		}
+	}
 
 	private class LoginOnClickListener implements Button.OnClickListener {
-
+		AsyncResponse delegate;
+		
+		public LoginOnClickListener(AsyncResponse resp){
+			delegate = resp;
+		}
+		
 		@Override
 		public void onClick(View v) {
 			switch (v.getId()) {
 			// TODO Implement actual login logic
 			case R.id.login_button:
-				// Intent i = new Intent(LoginActivity.this,
-				// MainActivity.class);
-				// LoginActivity.this.startActivity(i);
-				APIRequestHandler h = new APIRequestHandler(act,
-						APIRequestHandler.ACCOUNTS_REQUEST);
+				h = new APIRequestHandler(act,
+						APIRequestHandler.LOGIN_REQUEST);
 				h.setLoginInfo(userNameField.getText().toString(),
 						passwordField.getText().toString());
+				h.setAsyncDelegate(delegate);
 				h.execute();
 
 			}
 		}
 	}
 
-	private class ServerAddOnClickListener implements
-			ImageButton.OnClickListener {
-
+	private class ServerAddOnClickListener implements ImageButton.OnClickListener {
 		private Context ctx;
 		private EditText urlField, portField;
 		private View view;
@@ -203,8 +239,30 @@ public class LoginActivity extends FragmentActivity {
 		}
 	}
 
-	// TODO Fully implement class
-	private class OnTextChangedListener {
+	private class OnTextChangedListener implements TextWatcher{
+		@Override
+		public void onTextChanged(CharSequence s, int start, int before,
+				int count) {
+			if ((passwordField.getText().length() > 1) && (userNameField.getText().length() > 1)){
+				loginButton.setEnabled(true);
+			}
+			else {
+				loginButton.setEnabled(false);
+			}
+			
+		}
 
+		@Override
+		public void afterTextChanged(Editable s) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void beforeTextChanged(CharSequence s, int start, int count,
+				int after) {
+			// TODO Auto-generated method stub
+			
+		}
 	}
 }
