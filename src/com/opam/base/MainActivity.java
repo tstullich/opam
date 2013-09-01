@@ -1,11 +1,13 @@
 package com.opam.base;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Locale;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.opam.request.types.Account;
 import com.opam.request.types.AccountsCollection;
 import com.tim.stullich.drawerapp.R;
 
@@ -142,6 +144,8 @@ public class MainActivity extends FragmentActivity {
 		public static final String ARG_SECTION_NUMBER = "section_number";
 		private ProgressBar progress;
 		private SimpleExpandableListAdapter adapter;
+		private ArrayList<String> accountNames;
+		private ArrayList<Account> accounts;
 		
 		public MainSectionFragment() {
 		}
