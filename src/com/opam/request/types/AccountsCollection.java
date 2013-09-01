@@ -8,8 +8,7 @@ public class AccountsCollection {
 	private ArrayList<Account> accountCollection;
 	private int count;
 
-	public AccountsCollection() {
-	};
+	public AccountsCollection() {};
 
 	@JsonProperty("AccountCollection")
 	public ArrayList<Account> getAccountCollection() {
@@ -29,5 +28,9 @@ public class AccountsCollection {
 	@JsonProperty("count")
 	public void setCount(int count) {
 		this.count = count;
+	}
+	
+	public Account getAccount(int index) {
+		return this.accountCollection.get(index);
 	}
 }

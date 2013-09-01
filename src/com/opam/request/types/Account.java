@@ -15,4 +15,7 @@ public class Account {
 		this.account = account;
 	}
 	
+	public String getName(){
+		return account.getAccountName();
+	}
 }

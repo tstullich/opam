@@ -11,14 +11,6 @@
         
     <ExpandableListView
          android:id="@+id/accounts_list"
-         android:layout_width="fill_parent"
-         android:layout_height="wrap_content" />
-    <ProgressBar 
-        android:id="@+id/accounts_load_progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:indeterminate="true" />
-
+         android:layout_width="match_parent"
+         android:layout_height="match_parent" />
 </RelativeLayout>

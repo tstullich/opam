@@ -2,7 +2,10 @@ package com.opam.base;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -61,7 +64,6 @@ public class MainActivity extends FragmentActivity {
 	private SideDrawer mLeftDrawer;
 	private ActionBarDrawerToggle drawerToggle;
 	private Activity act;
-	private SimpleExpandableListAdapter accountsListAdapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -142,21 +144,19 @@ public class MainActivity extends FragmentActivity {
 		 * fragment.
 		 */
 		public static final String ARG_SECTION_NUMBER = "section_number";
-		private ProgressBar progress;
-		private SimpleExpandableListAdapter adapter;
+		private CustomExpandableListAdapter adapter;
+		private AccountsCollection coll;
+		private ExpandableListView listView;
 		private ArrayList<String> accountNames;
-		private ArrayList<Account> accounts;
 		
-		public MainSectionFragment() {
-		}
+		public MainSectionFragment() {};
 
 		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			View rootView = inflater.inflate(R.layout.main_fragment, container,
 					false);
-			progress = (ProgressBar) rootView.findViewById(R.id.accounts_load_progress);
-			progress.animate();
+			
+			listView = (ExpandableListView) rootView.findViewById(R.id.accounts_list);
 			
 			createAccountsList();
 			
@@ -174,9 +174,9 @@ public class MainActivity extends FragmentActivity {
 		@Override
 		public void processFinish(String json) {
 			ObjectMapper mapper = new ObjectMapper();
-			AccountsCollection accounts = null;
+			coll = null;
 			try {
-				accounts = mapper.readValue(json, AccountsCollection.class);
+				coll = mapper.readValue(json, AccountsCollection.class);
 			} catch (JsonParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -188,7 +188,35 @@ public class MainActivity extends FragmentActivity {
 				e.printStackTrace();
 			}
 			
+			initListHeader(coll);
+			
+			adapter = new CustomExpandableListAdapter(
+					getActivity(), 
+					accountNames,
+					createGroupList(coll));
+			listView.setAdapter(adapter);
 		}
+		
+		private HashMap<String, List<String>> createGroupList(AccountsCollection col) {
+			HashMap<String, List<String>> map = new HashMap<String, List<String>>();
+			
+			for (Account acc : col.getAccountCollection()) {
+				ArrayList<String> list = new ArrayList<String>();
+				list.add("UID: " + acc.getAccount().getAccountUID());
+				list.add("URI: " + acc.getAccount().getUri());
+				map.put(acc.getName(), list);
+			}
+			
+			return map;
+		}
+
+		private void initListHeader(AccountsCollection col) {
+			accountNames = new ArrayList<String>();
+			for (int i = 0; i < col.getCount(); i++) {
+				accountNames.add(col.getAccount(i).getName());
+			}
+		}
+		
 	}
 
 	@Override
@@ -270,12 +298,12 @@ public class MainActivity extends FragmentActivity {
 					int position, long id) {
 				if (position == listOptions.length - 1) {
 					finish();
-				} else if (position == 2) {
+				} 
+				else if (position == 2) {
 					APIRequestHandler req = new APIRequestHandler(act,
 							APIRequestHandler.DEBUG_MODE);
 					req.execute();
 				}
-				Toast.makeText(mCtx, "Clicked Item", Toast.LENGTH_SHORT).show();
 			}
 
 		}

@@ -2,9 +2,6 @@ package com.opam.base;
 
 import java.io.IOException;
 import java.security.KeyStore;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.auth.AuthScope;
@@ -28,12 +25,8 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.deser.std.FromStringDeserializer;
-import com.opam.request.types.Account;
-import com.opam.request.types.AccountsCollection;
-import com.opam.request.types.AccountWrapper;
+import com.tim.stullich.drawerapp.R;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -42,6 +35,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 
 public class APIRequestHandler extends AsyncTask<Void, Void, Boolean> {
 
@@ -123,7 +117,8 @@ public class APIRequestHandler extends AsyncTask<Void, Void, Boolean> {
 			
 		} else {
 			dialog.dismiss();
-			AlertDialog.Builder builder = new Builder(ctx);
+			AlertDialog.Builder builder = new Builder(
+					new ContextThemeWrapper(ctx, R.style.AppBaseTheme));
 			builder.setTitle("Request Unsuccessful");
 			if (response != null) {
 				builder.setMessage(response.getStatusLine().toString());
