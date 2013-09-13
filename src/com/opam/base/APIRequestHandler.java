@@ -2,6 +2,7 @@ package com.opam.base;
 
 import java.io.IOException;
 import java.security.KeyStore;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.auth.AuthScope;
@@ -10,6 +11,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
@@ -45,11 +47,13 @@ public class APIRequestHandler extends AsyncTask<Void, Void, Boolean> {
 	public static final int TARGET_REQUEST = 1;
 	public static final int TARGET_ATTRIBUTE_REQUEST = 2;
 	public static final int ACCOUNTS_REQUEST = 3;
+	public static final int ACCOUNT_CHECKOUT_REQUEST = 4;
 	public static final int LOGIN_REQUEST = 0;
 
 	private static String SERVER_ADDRESS;
 	private static int SERVER_PORT;
 	private String requestAddress;
+	private int requestInt;
 
 	private HttpResponse response;
 	private HttpClient client;
@@ -78,6 +82,7 @@ public class APIRequestHandler extends AsyncTask<Void, Void, Boolean> {
 
 		ctx = act;
 		dialog = new ProgressDialog(ctx);
+		requestInt = apiRequestType;
 
 		// TODO Build more cases... maybe even a better way to implement this.
 		StringBuilder sb = new StringBuilder();
@@ -96,12 +101,21 @@ public class APIRequestHandler extends AsyncTask<Void, Void, Boolean> {
 			requestAddress = "https://" + SERVER_ADDRESS + ":" + SERVER_PORT
 					+ "/opam/";
 			break;
+		case ACCOUNT_CHECKOUT_REQUEST:
+			sb.append("https://" + SERVER_ADDRESS + ":" + SERVER_PORT
+					+ "/opam/account/");
+			requestAddress = sb.toString();
+			break;
 		}
 	}
 
 	public void setLoginInfo(String userName, String password) {
 		this.userName = userName;
 		this.password = password;
+	}
+	
+	public void setAccountID(String targetID) {
+		requestAddress += targetID + "/checkout";
 	}
 
 	protected void onPreExecute() {
@@ -133,11 +147,18 @@ public class APIRequestHandler extends AsyncTask<Void, Void, Boolean> {
 	@Override
 	protected Boolean doInBackground(Void... param) {
 		client = new OPAMHttpClient().iniHttpClient();
-		HttpGet request = null;
+		HttpGet getRequest = null;
+		HttpPut putRequest = null;
 		response = null;
 		try {
-			request = new HttpGet(requestAddress);
-			response = client.execute(request);
+			if (requestInt != 4) {
+				getRequest = new HttpGet(requestAddress);
+				response = client.execute(getRequest);
+			}
+			else {
+				putRequest = new HttpPut(requestAddress);
+				response = client.execute(putRequest);
+			}
 			if (response != null && response.getStatusLine().toString().contains("200")) {
 				json = EntityUtils.toString(response.getEntity());
 				Log.i("OPAM", response.getStatusLine().toString());				

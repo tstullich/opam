@@ -63,7 +63,7 @@ public class MainActivity extends FragmentActivity {
 	private ViewPager mViewPager;
 	private SideDrawer mLeftDrawer;
 	private ActionBarDrawerToggle drawerToggle;
-	private Activity act;
+	private static Activity act;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -191,23 +191,11 @@ public class MainActivity extends FragmentActivity {
 			initListHeader(coll);
 			
 			adapter = new CustomExpandableListAdapter(
+					act,
 					getActivity(), 
 					accountNames,
-					createGroupList(coll));
+					coll.getAccountCollection());
 			listView.setAdapter(adapter);
-		}
-		
-		private HashMap<String, List<String>> createGroupList(AccountsCollection col) {
-			HashMap<String, List<String>> map = new HashMap<String, List<String>>();
-			
-			for (Account acc : col.getAccountCollection()) {
-				ArrayList<String> list = new ArrayList<String>();
-				list.add("UID: " + acc.getAccount().getAccountUID());
-				list.add("URI: " + acc.getAccount().getUri());
-				map.put(acc.getName(), list);
-			}
-			
-			return map;
 		}
 
 		private void initListHeader(AccountsCollection col) {
@@ -258,7 +246,7 @@ public class MainActivity extends FragmentActivity {
 
 			this.listView.setOnItemClickListener(new DrawerItemClickListener(
 					context));
-
+			
 			setUpActionbar(act);
 		}
 
