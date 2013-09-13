@@ -1,16 +1,7 @@
 package com.opam.base;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opam.request.types.Account;
-import com.opam.request.types.AccountToken;
-import com.tim.stullich.drawerapp.R;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -26,6 +17,15 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.opam.request.types.Account;
+import com.opam.request.types.AccountToken;
+import com.opam.request.types.CheckInStatus;
+import com.tim.stullich.drawerapp.R;
+
 public class CustomExpandableListAdapter extends BaseExpandableListAdapter implements AsyncResponse{
 
 	private Context _context;
@@ -34,7 +34,9 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter imple
     // child data in format of header title, child title
     private List<Account> _listDataChild;
     private AsyncResponse delegate;
- 
+    private boolean checkIn;
+    private int groupPosi;
+    
     public CustomExpandableListAdapter(Activity act, Context context, List<String> listDataHeader,
             List<Account> listChildData) {
         this._context = context;
@@ -46,8 +48,6 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter imple
  
     @Override
     public Object getChild(int groupPosition, int childPosititon) {
-        //return this._listDataChild.get(this._listDataHeader.get(groupPosition))
-        //        .get(childPosititon);
     	return _listDataChild.get(groupPosition);
     }
  
@@ -59,9 +59,8 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter imple
     @Override
     public View getChildView(int groupPosition, final int childPosition,
             boolean isLastChild, View convertView, ViewGroup parent) {
- 
-        //final String childText = (String) getChild(groupPosition, childPosition);
     	final Account acc = _listDataChild.get(groupPosition);
+    	groupPosi = groupPosition;
     	String childText = "Target UID: " + acc.getAccount().getTargetUID();
     	Log.i("OPAM", acc.getAccount().getAccountUID());
     	
@@ -71,11 +70,16 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter imple
             convertView = infalInflater.inflate(R.layout.account_sub_item, null);
         }
  
-        TextView txtListChild = (TextView) convertView
-                .findViewById(R.id.grp_child);
+        TextView txtListChild = (TextView) convertView.findViewById(R.id.grp_child);
         txtListChild.setText(childText);
         
         Button b = (Button) convertView.findViewById(R.id.checkout_button);
+        if (acc.getAccount().getStatus().equals("checkedIn")) {
+        	b.setText(R.string.checkout_button_text);
+        }
+        else {
+        	b.setText(R.string.checkin_button_text);
+        }
         b.setOnClickListener(new OnClickListener(){
 
 			@Override
@@ -91,33 +95,62 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter imple
 	public void processFinish(String json) {
     	ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		AccountToken token = null;
-		try {
-			token = mapper.readValue(json, AccountToken.class);
-		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		Log.i("OPAM", "Account Token Generated: " + token.getWrapper().getAccountName() + " " 
+		if (!checkIn) {
+			AccountToken token = null;
+			try {
+				token = mapper.readValue(json, AccountToken.class);
+			} catch (JsonParseException e) {
+				e.printStackTrace();
+			} catch (JsonMappingException e) {
+				e.printStackTrace();
+			} 	catch (IOException e) {
+				e.printStackTrace();
+			}
+			Log.i("OPAM", "Account Token Generated: " + token.getWrapper().getAccountName() + " " 
 				+ token.getWrapper().getAccountPassword());
-		AlertDialog.Builder builder = new AlertDialog.Builder(_context);
-		builder.setTitle("Account Checked Out Successfully!");
-		builder.setMessage("Account Name: " + token.getWrapper().getAccountName() +
+			AlertDialog.Builder builder = new AlertDialog.Builder(_context);
+			builder.setTitle("Account Checked Out Successfully!");
+			builder.setMessage("Account Name: " + token.getWrapper().getAccountName() +
 				"\n" + "Password: " + token.getWrapper().getAccountPassword());
-		builder.setPositiveButton("OK", null);
-		builder.create().show();
+			builder.setPositiveButton("OK", null);
+			builder.create().show();
+			_listDataChild.get(groupPosi).getAccount().setStatus("checkedOut");
+			notifyDataSetChanged();
+			
+		}
+		else {
+			CheckInStatus status = null;
+			try {
+				status = mapper.readValue(json, CheckInStatus.class);
+			} catch (JsonParseException e) {
+				e.printStackTrace();
+			} catch (JsonMappingException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			if (status != null) {
+				AlertDialog.Builder builder = new AlertDialog.Builder(_context);
+				builder.setTitle("Account Checked In Successfully!");
+				builder.setMessage("You can check out this account again at any time.");
+				builder.setPositiveButton("OK", null);
+				builder.create().show();
+				_listDataChild.get(groupPosi).getAccount().setStatus("checkedIn");
+				notifyDataSetChanged();
+			}
+			else {
+				AlertDialog.Builder builder = new AlertDialog.Builder(_context);
+				builder.setTitle("There Was A Problem!");
+				builder.setMessage("The account was not checked in. Please try again or" +
+						" contact your system administrator.");
+				builder.setPositiveButton("OK", null);
+				builder.create().show();
+			}
+		}
     }
  
     @Override
     public int getChildrenCount(int groupPosition) {
-        //return this._listDataChild.get(this._listDataHeader.get(groupPosition))
-        //        .size();
     	return 1;
     }
  
@@ -139,7 +172,6 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter imple
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded,
             View convertView, ViewGroup parent) {
-        //final String headerTitle = (String) getGroup(groupPosition);
     	Account acc = _listDataChild.get(groupPosition);
     	String headerTitle = acc.getName();
     	if (convertView == null) {
@@ -168,6 +200,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter imple
     private AlertDialog buildAlert(final Account acc) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(_context);
 		if (acc.getAccount().getStatus().equals("checkedIn")) {
+			checkIn = false;
 			builder.setTitle("Check Out This Account?");
 			builder.setMessage("Account Name: " + acc.getName() + "\n"
 				+ "Target Name: " + acc.getAccount().getTargetName());
@@ -175,7 +208,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter imple
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				APIRequestHandler request = new APIRequestHandler(_act, APIRequestHandler.ACCOUNT_CHECKOUT_REQUEST);
-				request.setAccountID(acc.getAccount().getAccountUID());
+				request.setAccountID(acc.getAccount().getAccountUID(), true);
 				request.setAsyncDelegate(delegate);
 				request.setLoginInfo("olaf", "welcome1");
 				request.execute();
@@ -183,7 +216,22 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter imple
 			});
 		}
 		else {
-			builder.setTitle("Check In ");
+			checkIn = true;
+			builder.setTitle("Check In This Account?");
+			builder.setMessage("Account Name: " + acc.getName() + "\n"
+				+ "Target Name: " + acc.getAccount().getTargetName());
+			builder.setPositiveButton(R.string.checkin_button_text, new DialogInterface.OnClickListener(){
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					APIRequestHandler request = new APIRequestHandler(_act, APIRequestHandler.ACCOUNT_CHECKIN_REQUEST);
+					request.setAccountID(acc.getAccount().getAccountUID(), false);
+					request.setAsyncDelegate(delegate);
+					request.setLoginInfo("olaf", "welcome1");
+					request.execute();
+				}
+				
+			});
 		}
 		builder.setNegativeButton("NO", null);
 		return builder.create();

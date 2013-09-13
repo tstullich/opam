@@ -24,6 +24,7 @@
     <string name="add_server_text_view">Select A Server</string>
     <string name="checkout_button_text">Check Out</string>
     <string name="checkout_dialog_positive">YES</string>
+    <string name="checkin_button_text">Check In</string>
     
     <string-array name="drawer_list_names">
         <item>My Accounts</item>

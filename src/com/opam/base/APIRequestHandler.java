@@ -48,6 +48,7 @@ public class APIRequestHandler extends AsyncTask<Void, Void, Boolean> {
 	public static final int TARGET_ATTRIBUTE_REQUEST = 2;
 	public static final int ACCOUNTS_REQUEST = 3;
 	public static final int ACCOUNT_CHECKOUT_REQUEST = 4;
+	public static final int ACCOUNT_CHECKIN_REQUEST = 5;
 	public static final int LOGIN_REQUEST = 0;
 
 	private static String SERVER_ADDRESS;
@@ -106,6 +107,9 @@ public class APIRequestHandler extends AsyncTask<Void, Void, Boolean> {
 					+ "/opam/account/");
 			requestAddress = sb.toString();
 			break;
+		case ACCOUNT_CHECKIN_REQUEST:
+			requestAddress = "https://" + SERVER_ADDRESS + ":" + SERVER_PORT
+					+ "/opam/account/";
 		}
 	}
 
@@ -114,8 +118,13 @@ public class APIRequestHandler extends AsyncTask<Void, Void, Boolean> {
 		this.password = password;
 	}
 	
-	public void setAccountID(String targetID) {
-		requestAddress += targetID + "/checkout";
+	public void setAccountID(String targetID, boolean checkOut) {
+		if (checkOut) {
+			requestAddress += targetID + "/checkout";
+		}
+		else {
+			requestAddress += targetID + "/checkin";
+		}
 	}
 
 	protected void onPreExecute() {
@@ -228,7 +237,7 @@ public class APIRequestHandler extends AsyncTask<Void, Void, Boolean> {
 		   try {
 		      data = new ObjectMapper().readValue(jsonPacket, type);
 		   } catch (Exception e) {
-		      // Handle the problem
+		      
 		   }
 		   return data;
 		}
