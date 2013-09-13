@@ -173,7 +173,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter imple
     public View getGroupView(int groupPosition, boolean isExpanded,
             View convertView, ViewGroup parent) {
     	Account acc = _listDataChild.get(groupPosition);
-    	String headerTitle = acc.getName();
+    	String headerTitle = acc.getName() + " [" + acc.getAccount().getTargetName() + "]";
     	if (convertView == null) {
             LayoutInflater infalInflater = (LayoutInflater) this._context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);

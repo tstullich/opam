@@ -65,9 +65,6 @@ public class APIRequestHandler extends AsyncTask<Void, Void, Boolean> {
 	private Context ctx;
 	
 	private AsyncResponse delegate = null;
-
-	// private static final String USER_PREFS_FILE = "UserPrefs";
-
 	/**
 	 * Builds a request to be executed at a later time
 	 * 
@@ -78,7 +75,7 @@ public class APIRequestHandler extends AsyncTask<Void, Void, Boolean> {
 		// SharedPreferences settings =
 		// act.getSharedPreferences(USER_PREFS_FILE, 0);
 		// TODO Get Server info from Input Fields
-		SERVER_ADDRESS = "192.168.0.27";
+		SERVER_ADDRESS = "slcag143.us.oracle.com";
 		SERVER_PORT = 18102;
 
 		ctx = act;
@@ -137,7 +134,6 @@ public class APIRequestHandler extends AsyncTask<Void, Void, Boolean> {
 		if (dialog.isShowing() && success) {
 			dialog.dismiss();
 			delegate.processFinish(json);
-			
 		} else {
 			dialog.dismiss();
 			AlertDialog.Builder builder = new Builder(
@@ -160,13 +156,14 @@ public class APIRequestHandler extends AsyncTask<Void, Void, Boolean> {
 		HttpPut putRequest = null;
 		response = null;
 		try {
-			if (requestInt != 4) {
+			if (requestInt != 4 && requestInt != 5) {
 				getRequest = new HttpGet(requestAddress);
 				response = client.execute(getRequest);
 			}
 			else {
 				putRequest = new HttpPut(requestAddress);
 				response = client.execute(putRequest);
+				Log.i("OPAM", "PUT Request: " + requestAddress);
 			}
 			if (response != null && response.getStatusLine().toString().contains("200")) {
 				json = EntityUtils.toString(response.getEntity());
