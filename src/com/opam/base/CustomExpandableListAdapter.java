@@ -79,24 +79,10 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter imple
         b.setOnClickListener(new OnClickListener(){
 
 			@Override
-			public void onClick(View v) {
-				AlertDialog.Builder builder = new AlertDialog.Builder(_context);
-				builder.setTitle("Check Out This Account?");
-				builder.setMessage("Account Name: " + acc.getName() + "\n"
-						+ "Target Name: " + acc.getAccount().getTargetName());
-				builder.setPositiveButton(R.string.checkout_dialog_positive, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						APIRequestHandler request = new APIRequestHandler(_act, APIRequestHandler.ACCOUNT_CHECKOUT_REQUEST);
-						request.setAccountID(acc.getAccount().getAccountUID());
-						request.setAsyncDelegate(delegate);
-						request.setLoginInfo("olaf", "welcome1");
-						request.execute();
-					}
-				});
-				builder.setNegativeButton("NO", null);
-				builder.create().show();
-			}        	
+			public void onClick(View arg0) {
+				AlertDialog dialog = buildAlert(acc);
+				dialog.show();
+			}			        	
         });
         return convertView;
     }
@@ -177,5 +163,29 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter imple
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return true;
+    }
+    
+    private AlertDialog buildAlert(final Account acc) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(_context);
+		if (acc.getAccount().getStatus().equals("checkedIn")) {
+			builder.setTitle("Check Out This Account?");
+			builder.setMessage("Account Name: " + acc.getName() + "\n"
+				+ "Target Name: " + acc.getAccount().getTargetName());
+			builder.setPositiveButton(R.string.checkout_dialog_positive, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				APIRequestHandler request = new APIRequestHandler(_act, APIRequestHandler.ACCOUNT_CHECKOUT_REQUEST);
+				request.setAccountID(acc.getAccount().getAccountUID());
+				request.setAsyncDelegate(delegate);
+				request.setLoginInfo("olaf", "welcome1");
+				request.execute();
+				}
+			});
+		}
+		else {
+			builder.setTitle("Check In ");
+		}
+		builder.setNegativeButton("NO", null);
+		return builder.create();
     }
 }
